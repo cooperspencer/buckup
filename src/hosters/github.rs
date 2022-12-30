@@ -29,12 +29,13 @@ pub struct Owner {
 }
 
 fn get(sort: String, user: &String, token: &String, what: String, page: u32) -> Result<String, String> {
-    let mut url = &format!("https://api.github.com/{}/{}/{}?per_page=100&page={}", sort, user, what, page);
-    if user.is_empty() {
-        let mut url = &format!("https://api.github.com/{}/{}?per_page=100&page={}", sort, what, page);
-    }
+    let url = match user.is_empty() {
+        true => format!("https://api.github.com/{}/{}?per_page=100&page={}", sort, what, page).to_owned(),
+        false => format!("https://api.github.com/{}/{}/{}?per_page=100&page={}", &sort, &user, what, page)
+    };
+    
     if token.is_empty() {
-        let res = match ureq::get(url)
+        let res = match ureq::get(&url)
             .call() {
                 Ok(r) => r,
                 Err(e) => return Err(e.to_string()),
@@ -42,7 +43,7 @@ fn get(sort: String, user: &String, token: &String, what: String, page: u32) -> 
         
         Ok(res.into_string().unwrap())
     } else {
-        let res = match ureq::get(url)
+        let res = match ureq::get(&url)
         .set("Authorization", &format!("Bearer {}", token))
         .call() {
             Ok(r) => r,
