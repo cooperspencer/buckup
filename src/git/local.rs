@@ -8,7 +8,6 @@ fn get_path(info: GitUrl) -> PathBuf {
 
 pub fn init_or_open_repo(info: GitUrl) -> Result<Repository, String> {
     let repo_path = get_path(info);
-    println!("{:?}", repo_path);
     if repo_path.is_dir() {
         match Repository::open_bare(repo_path) {
             Ok(r) => return Ok(r),
