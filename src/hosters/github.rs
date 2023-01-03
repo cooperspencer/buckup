@@ -28,24 +28,37 @@ pub struct Owner {
     pub login: String,
 }
 
-fn get(sort: String, user: &String, token: &String, what: String, page: u32) -> Result<String, String> {
+fn get(
+    sort: String,
+    user: &String,
+    token: &String,
+    what: String,
+    page: u32,
+) -> Result<String, String> {
     let url = match user.is_empty() {
-        true => format!("https://api.github.com/{}/{}?per_page=100&page={}", sort, what, page).to_owned(),
-        false => format!("https://api.github.com/{}/{}/{}?per_page=100&page={}", &sort, &user, what, page)
+        true => format!(
+            "https://api.github.com/{}/{}?per_page=100&page={}",
+            sort, what, page
+        )
+        .to_owned(),
+        false => format!(
+            "https://api.github.com/{}/{}/{}?per_page=100&page={}",
+            &sort, &user, what, page
+        ),
     };
-    
+
     if token.is_empty() {
-        let res = match ureq::get(&url)
-            .call() {
-                Ok(r) => r,
-                Err(e) => return Err(e.to_string()),
-            };
-        
+        let res = match ureq::get(&url).call() {
+            Ok(r) => r,
+            Err(e) => return Err(e.to_string()),
+        };
+
         Ok(res.into_string().unwrap())
     } else {
         let res = match ureq::get(&url)
-        .set("Authorization", &format!("Bearer {}", token))
-        .call() {
+            .set("Authorization", &format!("Bearer {}", token))
+            .call()
+        {
             Ok(r) => r,
             Err(e) => return Err(e.to_string()),
         };
@@ -54,19 +67,19 @@ fn get(sort: String, user: &String, token: &String, what: String, page: u32) -> 
     }
 }
 
-pub fn get_user_repos(user: String, token: String) -> Result<Vec<Repository>, String> {
+pub fn get_user_repos(user: String, token: &String) -> Result<Vec<Repository>, String> {
     let mut repos: Vec<Repository> = vec![];
     let mut page = 1;
 
     loop {
-        let text = match get("users".to_string(), &user, &token, "repos".to_string(), page) {
+        let text = match get("users".to_string(), &user, token, "repos".to_string(), page) {
             Ok(t) => t,
-            Err(e) => return Err(e.to_string())
+            Err(e) => return Err(e.to_string()),
         };
 
         let r: Vec<Repository> = match serde_json::from_str(&text) {
             Ok(r) => r,
-            Err(e) => return Err(e.to_string())
+            Err(e) => return Err(e.to_string()),
         };
 
         if r.len() > 0 {
@@ -80,19 +93,25 @@ pub fn get_user_repos(user: String, token: String) -> Result<Vec<Repository>, St
     Ok(repos)
 }
 
-pub fn get_repos_authenticated(token: String) -> Result<Vec<Repository>, String> {
+pub fn get_repos_authenticated(token: &String) -> Result<Vec<Repository>, String> {
     let mut repos: Vec<Repository> = vec![];
     let mut page = 1;
 
     loop {
-        let text = match get("user".to_string(), &"".to_string(), &token, "repos".to_string(), page) {
+        let text = match get(
+            "user".to_string(),
+            &"".to_string(),
+            token,
+            "repos".to_string(),
+            page,
+        ) {
             Ok(t) => t,
-            Err(e) => return Err(e.to_string())
+            Err(e) => return Err(e.to_string()),
         };
 
         let r: Vec<Repository> = match serde_json::from_str(&text) {
             Ok(r) => r,
-            Err(e) => return Err(e.to_string())
+            Err(e) => return Err(e.to_string()),
         };
 
         if r.len() > 0 {

@@ -1,47 +1,47 @@
-use clap::Error;
+use serde::Deserialize;
+use serde_derive::Serialize;
 use serde_yaml;
-use serde_derive::{Serialize};
-use serde::{Deserialize};
 
 #[derive(Serialize, Deserialize, Default, Debug)]
 pub struct Config {
-    source: Source,
-    destination: Local
+    pub source: Source,
+    pub destination: Destination,
 }
 
 #[derive(Serialize, Deserialize, Default, Debug)]
 pub struct Source {
-    github: Option<Vec<Hoster>>,
-    gitea: Option<Vec<Hoster>>
+    pub github: Option<Vec<Hoster>>,
+    pub gitea: Option<Vec<Hoster>>,
 }
 
 #[derive(Serialize, Deserialize, Default, Debug)]
 pub struct Destination {
-    local: Option<Vec<Local>>,
-    gitea: Option<Vec<Hoster>>
+    pub local: Option<Vec<Local>>,
+    pub gitea: Option<Vec<Hoster>>,
 }
 
 #[derive(Serialize, Deserialize, Default, Debug)]
 pub struct Local {
-    path: Option<String>,
+    pub path: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Default, Debug)]
 pub struct Hoster {
-    url: Option<String>,
-    user: Option<Vec<String>>,
-    org: Option<Vec<String>>,
-    token: Option<String>,
-    username: Option<String>,
-    password: Option<String>,
-    ssh: Option<bool>,
-    ssh_key: Option<String>,
-    exclude: Option<Vec<String>>,
-    include: Option<Vec<String>>,
-    exclude_orgs: Option<Vec<String>>,
-    include_orgs: Option<Vec<String>>,
-    wiki: Option<bool>,
-    starred: Option<bool>
+    pub url: Option<String>,
+    pub user: Option<Vec<String>>,
+    pub org: Option<Vec<String>>,
+    pub token: Option<String>,
+    pub username: Option<String>,
+    pub password: Option<String>,
+    pub ssh: Option<bool>,
+    pub ssh_key: Option<String>,
+    pub exclude: Option<Vec<String>>,
+    pub include: Option<Vec<String>>,
+    pub exclude_orgs: Option<Vec<String>>,
+    pub include_orgs: Option<Vec<String>>,
+    pub wiki: Option<bool>,
+    pub starred: Option<bool>,
+    pub bare: Option<bool>,
 }
 
 pub fn get_config(files: Vec<String>) -> Vec<Config> {

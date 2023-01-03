@@ -1,9 +1,13 @@
-use git2::{ Repository };
+use git2::Repository;
 use git_url_parse::GitUrl;
 use std::path::{Path, PathBuf};
 
 fn get_path(info: GitUrl) -> PathBuf {
-    Path::new("").join("backup").join(info.host.unwrap()).join(info.owner.unwrap()).join(info.name)
+    Path::new("")
+        .join("backup")
+        .join(info.host.unwrap())
+        .join(info.owner.unwrap())
+        .join(info.name)
 }
 
 pub fn init_or_open_repo(info: GitUrl) -> Result<Repository, String> {
