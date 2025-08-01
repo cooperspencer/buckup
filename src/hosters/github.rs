@@ -53,17 +53,17 @@ fn get(
             Err(e) => return Err(e.to_string()),
         };
 
-        Ok(res.into_string().unwrap())
+        Ok(res.into_body().read_to_string().unwrap())
     } else {
         let res = match ureq::get(&url)
-            .set("Authorization", &format!("Bearer {}", token))
+            .header("Authorization", &format!("Bearer {}", token))
             .call()
         {
             Ok(r) => r,
             Err(e) => return Err(e.to_string()),
         };
 
-        Ok(res.into_string().unwrap())
+        Ok(res.into_body().read_to_string().unwrap())
     }
 }
 
