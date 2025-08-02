@@ -1,4 +1,3 @@
-use tracing::info;
 use ureq;
 
 use serde_derive::Deserialize;
@@ -47,8 +46,6 @@ fn get(
             &sort, &user, what, page
         ),
     };
-
-    info!(url);
 
     if token.is_empty() {
         let res = match ureq::get(&url).call() {

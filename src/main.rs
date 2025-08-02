@@ -14,25 +14,11 @@ use git::local;
 use helper::url;
 use hosters::github;
 
-use git2::{Cred, FetchOptions, RemoteCallbacks};
-
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
 struct CLI {
     #[arg(short = 'c', long, required = false)]
     configfile: Option<Vec<String>>,
-}
-
-fn fetch_options_with_token(token: &str) -> FetchOptions<'_> {
-    let mut callbacks = RemoteCallbacks::new();
-
-    if !token.is_empty() {
-        callbacks.credentials(move |_, _, _| Cred::userpass_plaintext("x-access-token", token));
-    }
-
-    let mut fetch_options = FetchOptions::new();
-    fetch_options.remote_callbacks(callbacks);
-    fetch_options
 }
 
 fn process_repo(repo: &github::Repository, config: &conf::Config, token: &str) {
@@ -44,9 +30,7 @@ fn process_repo(repo: &github::Repository, config: &conf::Config, token: &str) {
         }
     };
 
-    let hoster = info.host.clone().unwrap_or_else(|| "unknown".to_string());
-
-    info!(hoster = hoster, "initializing {}.git", info.name);
+    info!(hoster = info.host, "processing repo {}", info.name);
 
     if let Some(local_dests) = &config.destination.local {
         for local_destination in local_dests {
@@ -55,52 +39,7 @@ fn process_repo(repo: &github::Repository, config: &conf::Config, token: &str) {
                 continue;
             };
 
-            let repository = match local::init_or_open_repo(&info, &path) {
-                Ok(r) => r,
-                Err(e) => {
-                    error!("could not open repo: {}", e.as_str());
-                    continue;
-                }
-            };
-
-            let mut remote = match repository.find_remote("origin") {
-                Ok(r) => r,
-                Err(_) => {
-                    info!(
-                        hoster = hoster,
-                        path = ?repository.path(),
-                        "adding remote"
-                    );
-                    match repository.remote("origin", &repo.clone_url) {
-                        Ok(r) => r,
-                        Err(e) => {
-                            error!("failed to add remote: {}", e.message());
-                            continue;
-                        }
-                    }
-                }
-            };
-
-            info!(hoster = hoster, path = ?repository.path(), "fetching changes");
-
-            let mut fetch_opts = fetch_options_with_token(token);
-            match remote.fetch(&["+refs/*:refs/*"], Some(&mut fetch_opts), None) {
-                Ok(_) => {
-                    info!(
-                        hoster = hoster,
-                        path = ?repository.path(),
-                        "successfully fetched changes"
-                    );
-                }
-                Err(e) => {
-                    error!(
-                        hoster = hoster,
-                        path = ?repository.path(),
-                        "a problem occurred while fetching: {:?}",
-                        e
-                    );
-                }
-            }
+            local::clone_or_fetch_repo(&info, &repo.clone_url, path, token);
         }
     }
 }
