@@ -1,3 +1,4 @@
+use tracing::info;
 use ureq;
 
 use serde_derive::Deserialize;
@@ -37,8 +38,8 @@ fn get(
 ) -> Result<String, String> {
     let url = match user.is_empty() {
         true => format!(
-            "https://api.github.com/{}/{}?per_page=100&page={}",
-            sort, what, page
+            "https://api.github.com/user/{}?per_page=100&page={}",
+            what, page
         )
         .to_owned(),
         false => format!(
@@ -46,6 +47,8 @@ fn get(
             &sort, &user, what, page
         ),
     };
+
+    info!(url);
 
     if token.is_empty() {
         let res = match ureq::get(&url).call() {
@@ -73,38 +76,6 @@ pub fn get_user_repos(user: String, token: &String) -> Result<Vec<Repository>, S
 
     loop {
         let text = match get("users".to_string(), &user, token, "repos".to_string(), page) {
-            Ok(t) => t,
-            Err(e) => return Err(e.to_string()),
-        };
-
-        let r: Vec<Repository> = match serde_json::from_str(&text) {
-            Ok(r) => r,
-            Err(e) => return Err(e.to_string()),
-        };
-
-        if r.len() > 0 {
-            repos.append(&mut r.clone());
-        } else {
-            break;
-        }
-
-        page += 1;
-    }
-    Ok(repos)
-}
-
-pub fn get_repos_authenticated(token: &String) -> Result<Vec<Repository>, String> {
-    let mut repos: Vec<Repository> = vec![];
-    let mut page = 1;
-
-    loop {
-        let text = match get(
-            "user".to_string(),
-            &"".to_string(),
-            token,
-            "repos".to_string(),
-            page,
-        ) {
             Ok(t) => t,
             Err(e) => return Err(e.to_string()),
         };
