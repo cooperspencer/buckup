@@ -24,7 +24,7 @@ destination:
 
 ## Future Plans
 **Planned source support:**
-- Gitea / Forgejo
+- ~~Gitea / Forgejo~~
 - Gogs
 - GitLab
 - OneDev
