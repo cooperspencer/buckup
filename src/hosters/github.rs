@@ -36,15 +36,8 @@ fn get(
     page: u32,
 ) -> Result<String, String> {
     let url = match user.is_empty() {
-        true => format!(
-            "https://api.github.com/user/{}?per_page=100&page={}",
-            what, page
-        )
-        .to_owned(),
-        false => format!(
-            "https://api.github.com/{}/{}/{}?per_page=100&page={}",
-            &sort, &user, what, page
-        ),
+        true => format!("https://api.github.com/user/{what}?per_page=100&page={page}").to_owned(),
+        false => format!("https://api.github.com/{sort}/{user}/{what}?per_page=100&page={page}"),
     };
 
     if token.is_empty() {
@@ -56,7 +49,7 @@ fn get(
         Ok(res.into_body().read_to_string().unwrap())
     } else {
         let res = match ureq::get(&url)
-            .header("Authorization", &format!("Bearer {}", token))
+            .header("Authorization", &format!("Bearer {token}"))
             .call()
         {
             Ok(r) => r,
@@ -82,7 +75,7 @@ pub fn get_user_repos(user: String, token: &String) -> Result<Vec<Repository>, S
             Err(e) => return Err(e.to_string()),
         };
 
-        if r.len() > 0 {
+        if !r.is_empty() {
             repos.append(&mut r.clone());
         } else {
             break;

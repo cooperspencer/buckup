@@ -5,7 +5,6 @@ mod hosters;
 
 use std::vec;
 
-use better_tracing;
 use clap::Parser;
 use tracing::{error, info};
 
@@ -30,7 +29,7 @@ fn process_repo(repo: &github::Repository, config: &conf::Config, token: &str) {
         }
     };
 
-    info!(hoster = info.host, "processing repo {}", info.name);
+    info!(source = info.host, "processing repo {}", info.name);
 
     if let Some(local_dests) = &config.destination.local {
         for local_destination in local_dests {
@@ -60,7 +59,7 @@ fn main() {
             for github in github_sources {
                 let token = github.token.clone().unwrap_or_default();
 
-                if let Some(users) = &github.user {
+                if let Some(users) = &github.users {
                     for user in users {
                         info!("backing up repos for {}", user);
                         let repos = match github::get_user_repos(user.clone(), &token) {

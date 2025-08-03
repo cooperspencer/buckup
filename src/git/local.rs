@@ -38,7 +38,7 @@ pub fn clone_or_fetch_repo(info: &GitUrl, remote_url: &str, backup_path: &str, t
     let repository = match init_or_open_repo(info, backup_path) {
         Ok(r) => r,
         Err(e) => {
-            error!(hoster = hoster, "failed to init/open repo: {}", e);
+            error!(source = hoster, "failed to init/open repo: {}", e);
             return;
         }
     };
@@ -46,24 +46,24 @@ pub fn clone_or_fetch_repo(info: &GitUrl, remote_url: &str, backup_path: &str, t
     let mut remote = match repository.find_remote("origin") {
         Ok(r) => r,
         Err(_) => {
-            info!(hoster = hoster, "adding remote");
+            info!(source = hoster, "adding remote");
             match repository.remote("origin", remote_url) {
                 Ok(r) => r,
                 Err(e) => {
-                    error!(hoster = hoster, "failed to add remote: {}", e.message());
+                    error!(source = hoster, "failed to add remote: {}", e.message());
                     return;
                 }
             }
         }
     };
 
-    info!(hoster = hoster, "fetching changes");
+    info!(source = hoster, "fetching changes");
 
     let mut fetch_opts = fetch_options_with_token(token);
     match remote.fetch(&["+refs/*:refs/*"], Some(&mut fetch_opts), None) {
-        Ok(_) => info!(hoster = hoster, "successfully fetched changes"),
+        Ok(_) => info!(source = hoster, "successfully fetched changes"),
         Err(e) => error!(
-            hoster = hoster,
+            source = hoster,
             path = ?repository.path(),
             "fetch failed: {:?}",
             e

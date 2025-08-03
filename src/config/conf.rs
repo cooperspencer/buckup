@@ -28,7 +28,7 @@ pub struct Local {
 #[derive(Serialize, Deserialize, Default, Debug)]
 pub struct Hoster {
     pub url: Option<String>,
-    pub user: Option<Vec<String>>,
+    pub users: Option<Vec<String>>,
     pub org: Option<Vec<String>>,
     pub token: Option<String>,
     pub username: Option<String>,
@@ -47,7 +47,7 @@ pub struct Hoster {
 pub fn get_config(files: Vec<String>) -> Vec<Config> {
     let mut confs: Vec<Config> = Vec::new();
     for file in files {
-        if file != "" {
+        if !file.is_empty() {
             let f = std::fs::File::open(&file).expect("file doesn't exist!");
 
             for document in serde_yaml::Deserializer::from_reader(f) {
