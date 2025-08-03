@@ -1,5 +1,5 @@
 # BUCKUP
-### Buckle up — here comes the backup!
+### Buckle up, here comes the backup!
 
 ![Robbie](assets/robbie_small.webp)
 
