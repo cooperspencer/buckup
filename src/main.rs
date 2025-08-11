@@ -11,7 +11,7 @@ use tracing::{error, info};
 use config::conf;
 use git::local;
 use helper::url;
-use hosters::{common, forgejo, gitea, github};
+use hosters::{common, forgejo, gitea, github, gogs};
 
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
@@ -112,6 +112,16 @@ fn main() {
                 let provider = forgejo::Forgejo::new(token.clone(), url.clone());
 
                 run_for_provider(&provider, forgejo.users.as_ref(), &config, &token);
+            }
+        }
+
+        if let Some(ref gogs_sources) = config.source.gogs {
+            for gogs in gogs_sources {
+                let token = gogs.token.clone().unwrap_or_default();
+                let url = gogs.url.clone().unwrap_or_default();
+                let provider = gogs::Gogs::new(token.clone(), url.clone());
+
+                run_for_provider(&provider, gogs.users.as_ref(), &config, &token);
             }
         }
     }
