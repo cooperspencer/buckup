@@ -12,7 +12,7 @@ pub struct Repository {
     pub owner: Owner,
     pub ssh_url: String,
     pub clone_url: String,
-    pub has_wiki: bool,
+    pub has_wiki: Option<bool>,
     pub default_branch: String,
 }
 

@@ -13,6 +13,7 @@ pub struct Source {
     pub github: Option<Vec<Hoster>>,
     pub gitea: Option<Vec<Hoster>>,
     pub forgejo: Option<Vec<Hoster>>,
+    pub gogs: Option<Vec<Hoster>>,
 }
 
 #[derive(Serialize, Deserialize, Default, Debug)]
